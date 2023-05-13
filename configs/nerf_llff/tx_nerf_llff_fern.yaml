@@ -1,0 +1,27 @@
+num_gpu: 2
+basdir: ./logs
+datadir: ./data/nerf_llff_data/fern
+tbdir: ./logs_tb
+dataset_type: llff
+
+# Training option
+N_rand: 1024
+N_samples: 64
+N_importance: 64
+N_iters: 200000
+lrate: 5.0e-4
+lrate_decay: 250
+
+i_print: 500
+i_weights: 20000
+i_testset: 50000
+i_video: 50000
+
+# data option
+factor: 1
+llffhold: 8
+
+# NeRF option
+use_viewdirs: True
+raw_noise_std: 1.0e-0
+rgb_activate: sigmoid

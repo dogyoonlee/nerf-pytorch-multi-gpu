@@ -1,0 +1,11 @@
+**/.ipynb_checkpoints
+data/*
+logs/*
+logs_tb/*
+
+*/__pycache__/
+.vscode/
+*.ipynb
+*/.DS_Store/
+
+dataset/
