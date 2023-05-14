@@ -93,39 +93,42 @@ class NeRFAll(nn.Module):
             depth_map: [num_rays]. Estimated distance to object.
         """
 
-        def raw2alpha(raw_, dists_, act_fn):
-            alpha_ = - torch.exp(-act_fn(raw_) * dists_) + 1.
-            return torch.cat([alpha_, torch.ones_like(alpha_[:, 0:1])], dim=-1)
+        # def raw2alpha(raw_, dists_, act_fn):
+        #     alpha_ = - torch.exp(-act_fn(raw_) * dists_) + 1.
+        #     return torch.cat([alpha_, torch.ones_like(alpha_[:, 0:1])], dim=-1)
+        raw2alpha = lambda raw, dists, act_fn=F.relu: 1.-torch.exp(-act_fn(raw)*dists)
 
         dists = z_vals[..., 1:] - z_vals[..., :-1]  # [N_rays, N_samples - 1]
-        # dists = torch.cat([dists, torch.tensor([1e10]).expand(dists[..., :1].shape)], -1)
+        dists = torch.cat([dists, torch.tensor([1e10]).expand(dists[..., :1].shape)], -1)
 
         dists = dists * torch.norm(rays_d[..., None, :], dim=-1)
 
         rgb = self.rgb_activate(raw[..., :3])
         noise = 0.
         if raw_noise_std > 0.:
-            noise = torch.randn_like(raw[..., :-1, 3]) * raw_noise_std
+            # noise = torch.randn_like(raw[..., :-1, 3]) * raw_noise_std
+            noise = torch.randn(raw[...,3].shape) * raw_noise_std
 
             # Overwrite randomly sampled data if pytest
             if pytest:
                 np.random.seed(0)
                 noise = np.random.rand(*list(raw[..., 3].shape)) * raw_noise_std
                 noise = torch.tensor(noise)
-
-        density = self.sigma_activate(raw[..., :-1, 3] + noise)
-        if not self.training and self.args.render_rmnearplane > 0:
-            mask = z_vals[:, 1:]
-            mask = mask > self.args.render_rmnearplane / 128
-            mask = mask.type_as(density)
-            density = mask * density
+        # density = self.sigma_activate(raw[..., :-1, 3] + noise)
+        # if not self.training and self.args.render_rmnearplane > 0:
+        #     mask = z_vals[:, 1:]
+        #     mask = mask > self.args.render_rmnearplane / 128
+        #     mask = mask.type_as(density)
+        #     density = mask * density
         
-        alpha = - torch.exp(- density * dists) + 1.
-        alpha = torch.cat([alpha, torch.ones_like(alpha[:, 0:1])], dim=-1)
+        # alpha = - torch.exp(- density * dists) + 1.
+        alpha = raw2alpha(raw[...,3] + noise, dists)  # [N_rays, N_samples]
+        # alpha = torch.cat([alpha, torch.ones_like(alpha[:, 0:1])], dim=-1)
 
-        weights = alpha * \
-                  torch.cumprod(torch.cat([torch.ones((alpha.shape[0], 1)), - alpha + (1. + 1e-10)], -1), -1)[:, :-1]
-
+        # weights = alpha * \
+                #   torch.cumprod(torch.cat([torch.ones((alpha.shape[0], 1)), - alpha + (1. + 1e-10)], -1), -1)[:, :-1]
+        weights = alpha * torch.cumprod(torch.cat([torch.ones((alpha.shape[0], 1)), 1.-alpha + 1e-10], -1), -1)[:, :-1]
+        
         rgb_map = torch.sum(weights[..., None] * rgb, -2)  # [N_rays, 3]
         depth_map = torch.sum(weights * z_vals, -1)
 

@@ -165,7 +165,7 @@ def train():
                 render_factor=args.render_factor,
             )
             rgbshdr = rgbshdr[:len(rgbshdr) - dummy_num]
-            disps = (1. - disps)
+            # disps = (1. - disps)
             disps = disps[:len(disps) - dummy_num].cpu().numpy()
             rgbs = rgbshdr
             rgbs = to8b(rgbs.cpu().numpy())
@@ -336,7 +336,7 @@ def train():
             moviebase = os.path.join(basedir, expname, '{}_spiral_{:06d}_'.format(expname, i))
             rgbs = (rgbs - rgbs.min()) / (rgbs.max() - rgbs.min())
             rgbs = rgbs.cpu().numpy()
-            disps = (1. - disps)
+            # disps = (1. - disps)
             disps = disps.cpu().numpy()
 
             imageio.mimwrite(moviebase + 'rgb.mp4', to8b(rgbs), fps=30, quality=8)
@@ -358,7 +358,7 @@ def train():
                 rgbs, disps, _ = nerf(H, W, K, args.chunk, poses=poses_with_dummy.cuda(),
                                render_kwargs=render_kwargs_test)
                 rgbs = rgbs[:len(rgbs) - dummy_num]
-                disps = (1. - disps)
+                # disps = (1. - disps)
                 disps = disps[:len(disps) - dummy_num]
                 disps = disps / disps.max()
                 rgbs_save = rgbs  # (rgbs - rgbs.min()) / (rgbs.max() - rgbs.min()
