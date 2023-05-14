@@ -30,6 +30,7 @@ pip install -r requirements.txt
   <li>pyyaml
   <li>tqdm
   <li>mediapy
+  <li>pillow
 </details>
 
 ## 2. Download dataset
