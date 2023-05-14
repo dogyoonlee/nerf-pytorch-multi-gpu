@@ -1,7 +1,6 @@
 import os
 import time
 import cv2
-import imageio
 from tensorboardX import SummaryWriter
 from box import Box
 import yaml
@@ -12,7 +11,6 @@ from utils.configs import config_parser
 from models.nerf import *
 from utils.run_nerf_helpers import *
 from data_utils.data_loader import nerf_data_loader
-from PIL import Image as PILImage
 from tqdm import tqdm, trange
 
 # np.random.seed(2023)
