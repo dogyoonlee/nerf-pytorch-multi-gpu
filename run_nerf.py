@@ -5,7 +5,7 @@ import imageio
 from tensorboardX import SummaryWriter
 from box import Box
 import yaml
-from utils.utils import compute_time, make_poses_with_dummy, compute_all_metrics
+from utils.utils import compute_time, make_poses_with_dummy, compute_all_metrics, create_videos, save_img
 from utils.configs import config_parser
 
 # from NeRF import *
@@ -172,8 +172,8 @@ def train():
             disps = to8b(disps / disps.max())
             if args.render_test:
                 for rgb_idx, rgb8 in enumerate(rgbs):
-                    imageio.imwrite(os.path.join(testsavedir, f'{rgb_idx:03d}.png'), rgb8)
-                    imageio.imwrite(os.path.join(testsavedir, f'{rgb_idx:03d}_disp.png'), disps[rgb_idx])
+                    save_img(rgb8, os.path.join(testsavedir, f'{rgb_idx:03d}.png'))
+                    save_img(disps[rgb_idx], os.path.join(testsavedir, f'{rgb_idx:03d}_disp.png'), vis_type='turbo')
                 
                 # evaluation
                 rgbs_test = torch.tensor(rgbshdr).cuda()
@@ -190,9 +190,8 @@ def train():
                     outfile.write(f"**[Evaluation]** : PSNR:{test_vals['psnr']:.8f} SSIM:{test_vals['ssim']:.8f} LPIPS:{test_vals['lpips']:.8f}\n")
                     print(f"**[Evaluation]** : PSNR:{test_vals['psnr']:.8f} SSIM:{test_vals['ssim']:.8f} LPIPS:{test_vals['lpips']:.8f}")
             else:
-                prefix = 'epi_' if args.render_epi else ''
-                imageio.mimwrite(os.path.join(testsavedir, f'{prefix}video.mp4'), rgbs, fps=30, quality=9)
-                imageio.mimwrite(os.path.join(testsavedir, f'{prefix}video_disp.mp4'), disps, fps=30, quality=9)
+                create_videos(rgbs, testsavedir, prefix='', render_data_type='color', depth_vis_type='turbo')
+                create_videos(disps, testsavedir, prefix='', render_data_type='depth', depth_vis_type='turbo')
 
             return
 
@@ -306,11 +305,6 @@ def train():
         new_lrate = args.lrate * (decay_rate ** (global_step / decay_steps))
         for param_group in optimizer.param_groups:
             param_group['lr'] = new_lrate
-        ################################
-
-        # dt = time.time() - time0
-        # print(f"Step: {global_step}, Loss: {loss}, Time: {dt}")
-        #####           end            #####
 
         # Rest is logging
         if i % args.i_weights == 0:
@@ -335,15 +329,15 @@ def train():
             
             moviebase = os.path.join(basedir, expname, '{}_spiral_{:06d}_'.format(expname, i))
             rgbs = (rgbs - rgbs.min()) / (rgbs.max() - rgbs.min())
-            rgbs = rgbs.cpu().numpy()
             # disps = (1. - disps)
-            disps = disps.cpu().numpy()
+            rgbs = to8b(rgbs.cpu().numpy())
+            disps = to8b(disps / disps.max())
 
-            imageio.mimwrite(moviebase + 'rgb.mp4', to8b(rgbs), fps=30, quality=8)
-            imageio.mimwrite(moviebase + 'disp.mp4', to8b(disps / disps.max()), fps=30, quality=8)
+            create_videos(rgbs, moviebase, prefix='', render_data_type='color', depth_vis_type='turbo')
+            create_videos(disps, moviebase, prefix='', render_data_type='depth', depth_vis_type='turbo')
 
             print('Done, saving', rgbs.shape, disps.shape)
-            # )
+            
 
         if i % args.i_testset == 0 and i > 0:
             testsavedir = os.path.join(basedir, expname, 'testset_{:06d}'.format(i))
@@ -367,8 +361,8 @@ def train():
                     rgb8 = to8b(rgb.cpu().numpy())
                     disps8 = disps[rgb_idx].cpu().numpy()
                     disps8 = to8b(disps8)
-                    imageio.imwrite(os.path.join(testsavedir, f'{rgb_idx:03d}.png'), rgb8)
-                    imageio.imwrite(os.path.join(testsavedir, f'{rgb_idx:03d}_disp.png'), disps8)
+                    save_img(rgb8, os.path.join(testsavedir, f'{rgb_idx:03d}.png'))
+                    save_img(disps8, os.path.join(testsavedir, f'{rgb_idx:03d}_disp.png'), vis_type='turbo')
 
                 # evaluation
                 target_rgb_gt = imagesf[i_test]
@@ -400,8 +394,6 @@ def train():
         if i % args.i_print == 0:
             dt_h, dt_m, dt_s = compute_time((time.time() - time_init))
             dt_h, dt_m = int(dt_h), int(dt_m)
-            # print(f"[TRAIN] Iter: {i} Loss: {loss.item()}  PSNR: {psnr.item()}")
-            # print(f"[TRAIN] Iter: {i} Loss: {loss.item()}  PSNR: {psnr.item()} TIME: {dt_h}h:{dt_m}m:{dt_s:.2f}s")
             tqdm.write(f"[TRAIN] Iter: {i} Loss: {loss.item()}  PSNR: {psnr.item()} TIME: {dt_h}h:{dt_m}m:{dt_s:.2f}s")
             
         global_step += 1

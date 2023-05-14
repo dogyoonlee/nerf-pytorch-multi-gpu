@@ -29,6 +29,7 @@ pip install -r requirements.txt
   <li>python-box
   <li>pyyaml
   <li>tqdm
+  <li>mediapy
 </details>
 
 ## 2. Download dataset

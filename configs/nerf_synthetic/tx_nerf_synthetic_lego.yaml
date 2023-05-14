@@ -8,7 +8,7 @@ dataset_type: blender
 N_rand: 1024
 N_samples: 64
 N_importance: 64
-N_iters: 200000
+N_iters: 300000
 lrate: 5.0e-4
 lrate_decay: 250
 
@@ -16,7 +16,7 @@ no_ndc: True
 lindisp: True
 spherify: True
 
-i_print: 500
+i_print: 1000
 i_weights: 20000
 i_testset: 50000
 i_video: 50000
