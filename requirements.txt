@@ -1,6 +1,6 @@
 # python = 3.8.13
 numpy
-scikit-image
+scikit-image==0.17.2
 torch>=1.11 # 1.11.0+cu113
 torchvision>=0.12.0 # 0.12.0+cu113
 # pip install torch==1.11.0+cu113 torchvision==0.12.2+cu118 torchaudio==0.7.2 -f https://download.pytorch.org/whl/t$rch_stable.html
