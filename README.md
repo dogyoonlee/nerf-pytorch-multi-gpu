@@ -7,6 +7,8 @@ We simply use `nn.DataParallel` based on the [[DeblurNeRF]](https://github.com/l
 # Training & Evaluation
 
 ## 1. Environment
+
+
 ```
 git clone https://github.com/dogyoonlee/nerf-pytorch-multi-gpu.git
 cd nerf-pytorch-multi-gpu
@@ -32,6 +34,10 @@ pip install -r requirements.txt
   <li>mediapy
   <li>pillow
 </details>
+
+Note that, you should match the version of torch and torchvision to properly work on your gpu.
+
+Refer the torch install comments in `requirements.txt`.
 
 ## 2. Download dataset
 There are various datasets based on NeRF

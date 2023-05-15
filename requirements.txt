@@ -2,8 +2,9 @@
 numpy
 scikit-image
 torch>=1.11 # 1.11.0+cu113
-# pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 -f https://download.pytorch.org/whl/t$rch_stable.html
 torchvision>=0.12.0 # 0.12.0+cu113
+# pip install torch==1.11.0+cu113 torchvision==0.12.2+cu118 torchaudio==0.7.2 -f https://download.pytorch.org/whl/t$rch_stable.html
+# pip3 install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118
 imageio
 imageio-ffmpeg
 matplotlib
