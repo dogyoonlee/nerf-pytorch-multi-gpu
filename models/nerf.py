@@ -338,7 +338,7 @@ class NeRFAll(nn.Module):
             k_sh = list(sh[:-1]) + list(all_ret[k].shape[1:])
             all_ret[k] = torch.reshape(all_ret[k], k_sh)
         
-        k_extract = ['rgb_map', 'depth_map', 'acc_map']
+        k_extract = ['rgb_map', 'disp_map', 'acc_map']
         ret_list = [all_ret[k] for k in k_extract]
         ret_dict = {k: all_ret[k] for k in all_ret if k not in k_extract}
         if use_awp:
@@ -362,7 +362,7 @@ class NeRFAll(nn.Module):
             ])
 
         rgbs = []
-        depths = []
+        disps = []
 
         t = time.time()
         for i, c2w in enumerate(tqdm(render_poses)):
@@ -370,12 +370,12 @@ class NeRFAll(nn.Module):
             t = time.time()
             rays = get_rays(H, W, K, c2w)
             rays = torch.stack(rays, dim=-1)
-            rgb, depth, acc, extras = self.render(H, W, K, chunk=chunk, rays=rays, c2w=c2w[:3, :4], **render_kwargs)
+            rgb, disp, acc, extras = self.render(H, W, K, chunk=chunk, rays=rays, c2w=c2w[:3, :4], **render_kwargs)
             rgbs.append(rgb)
-            depths.append(depth)
+            disps.append(disp)
             # if i == 0:
             #     print(f"Rendered image shape - rgb: {rgb.shape} depth: {depth.shape}")
         rgbs = torch.stack(rgbs, 0)
-        depths = torch.stack(depths, 0)
+        disps = torch.stack(depths, 0)
 
-        return rgbs, depths, acc, extras
+        return rgbs, disps, acc, extras

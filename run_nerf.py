@@ -167,7 +167,7 @@ def train():
             disps = disps[:len(disps) - dummy_num].cpu().numpy()
             rgbs = rgbshdr
             rgbs = to8b(rgbs.cpu().numpy())
-            disps = to8b(disps / disps.max())
+            disps = to8b((disps - disps.min()) / (disps.max() - disps.min()))
             if args.render_test:
                 for rgb_idx, rgb8 in enumerate(rgbs):
                     save_img(rgb8, os.path.join(testsavedir, f'{rgb_idx:03d}.png'))
@@ -329,7 +329,8 @@ def train():
             rgbs = (rgbs - rgbs.min()) / (rgbs.max() - rgbs.min())
             # disps = (1. - disps)
             rgbs = to8b(rgbs.cpu().numpy())
-            disps = to8b(disps / disps.max())
+            disps = to8b((disps - disps.min())/ (disps.max() - disps.min()))
+            
 
             create_videos(rgbs, moviebase, prefix='', render_data_type='color', depth_vis_type='turbo')
             create_videos(disps, moviebase, prefix='', render_data_type='depth', depth_vis_type='turbo')
@@ -352,7 +353,7 @@ def train():
                 rgbs = rgbs[:len(rgbs) - dummy_num]
                 # disps = (1. - disps)
                 disps = disps[:len(disps) - dummy_num]
-                disps = disps / disps.max()
+                disps = (disps - disps.min())/ (disps.max() - disps.min())
                 rgbs_save = rgbs  # (rgbs - rgbs.min()) / (rgbs.max() - rgbs.min()
                 # saving
                 for rgb_idx, rgb in enumerate(rgbs_save):
