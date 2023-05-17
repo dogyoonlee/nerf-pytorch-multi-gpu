@@ -27,7 +27,7 @@ def compute_all_metrics(pred, target, metric_list):
 def make_poses_with_dummy(poses, num_gpu=1):
     dummy_num = ((len(poses) - 1) // num_gpu + 1) * num_gpu - len(poses)
     # dummy_poses = torch.eye(3, 4).unsqueeze(0).expand(dummy_num, 3, 4).type_as(poses)
-    dummy_poses = torch.eye(poses.shape[-2], poses.shape[-2]).unsqueeze(0).expand(dummy_num, poses.shape[-2], poses.shape[-2]).type_as(poses)
+    dummy_poses = torch.eye(poses.shape[-2], poses.shape[-1]).unsqueeze(0).expand(dummy_num, poses.shape[-2], poses.shape[-1]).type_as(poses)
     if dummy_num > 0:
         poses_w_dummy = torch.cat([poses, dummy_poses], dim=0)
     else:
