@@ -1,6 +1,6 @@
-# Pytorch Implementation of NeRF for Multi-GPU without DDP.
+# Pytorch Refactoring of NeRF for Multi-GPU.
 
-Modified nerf code based on pytorch to use the multi gpu without complex DDP process.
+Refactored nerf code based on pytorch to use the multi gpu.
 
 We simply use `nn.DataParallel` based on the [[DeblurNeRF]](https://github.com/limacv/Deblur-NeRF) and [[DP-NeRF]](https://github.com/dogyoonlee/DP-NeRF) code referring the [[nerf-pytorch]](https://github.com/yenchenlin/nerf-pytorch) code.
 
